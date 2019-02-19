@@ -1,0 +1,28 @@
+
+user  nginx;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log debug;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+# Load balance UDP-based DNS traffic across two servers
+stream {
+    upstream gs_upstreams {
+        server ENDPOINT1;
+        server ENDPOINT2;
+    }
+
+    server {
+        listen LB_PORT udp;
+        proxy_pass gs_upstreams;
+        proxy_timeout 1s;
+        proxy_responses 1;
+        error_log /var/log/nginx/gslb.log debug;
+    }
+}
+

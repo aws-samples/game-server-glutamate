@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: mockup-server-grp2
+    release: r.0.1
+  name: mockup-server-grp2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mockup-server-grp2
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mockup-server-grp2
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - mockup-grp2
+              topologyKey: "kubernetes.io/hostname"
+
+      nodeSelector:
+        lifecycle: spot
+      containers:
+      - env:
+        - name: GROUP
+          value: "mockup-server-grp2"
+        - name: QUEUENAME
+          value: "serverstatus"
+        - name: MODE
+          value: survival
+        - name: PVP
+          value: "false"
+        - name: LEVEL_TYPE
+          value: DEFAULT
+        - name: ONLINE_MODE
+          value: "true"
+        image: 356566070122.dkr.ecr.us-west-2.amazonaws.com/mockup-udp-server
+        imagePullPolicy: Always
+        name: mockup-udp-server
+        command: ["/start.py"]
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /data
+          name: datadir
+      hostNetwork: true
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 2000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: datadir

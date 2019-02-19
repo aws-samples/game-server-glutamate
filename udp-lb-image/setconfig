@@ -1,0 +1,20 @@
+#!/bin/sh -x
+
+echo "setconfig of the nginx UDP load balancer"
+
+echo endpoint1=${ENDPOINT1}
+echo endpoint2=${ENDPOINT2}
+
+endpoint1=$ENDPOINT1
+endpoint2=$ENDPOINT2
+
+echo lb_port=${LB_PORT}
+lb_port=$LB_PORT
+
+sed -i "s/ENDPOINT1/$endpoint1/g" "nginx.conf.template"
+sed -i "s/ENDPOINT2/$endpoint2/g" "nginx.conf.template"
+sed -i "s/LB_PORT/$lb_port/g" "nginx.conf.template"
+
+cp nginx.conf.template /etc/nginx/nginx.conf
+nginx -g 'daemon off;'
+nginx -s reload

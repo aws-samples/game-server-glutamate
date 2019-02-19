@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: udp-lb
+    release: r.0.1
+  name: udp-lb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: udp-lb
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: udp-lb
+    spec:
+      nodeSelector:
+        lifecycle: ondemand
+      containers:
+      - env:
+        - name: APIENDPOINT
+          value: "ojtkmahrlh.execute-api.us-west-2.amazonaws.com"
+        - name: QUEUENAME
+          value: "serverstatus"
+        image: 356566070122.dkr.ecr.us-west-2.amazonaws.com/udp-lb
+        imagePullPolicy: Always
+        name: udp-lb
+        command: ["/start.py"]
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+      hostNetwork: true
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
